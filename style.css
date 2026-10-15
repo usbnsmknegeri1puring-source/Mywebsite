@@ -1,0 +1,1143 @@
+/* ==========================================================================
+   Smart Garden IoT - Modern Natural Design System (desain.md)
+   Color Palette: Deep Green #173F35, Leaf Green #299B6A, Mint Background #F5F8F5,
+   Sensor Blue #2389D7, Warning Orange #E99A35, Alert Red #D64545
+   ========================================================================== */
+
+:root {
+  /* Modern Natural Theme (Default Light) */
+  --color-primary: #173F35;       /* Hijau tua: Header & Identitas */
+  --color-primary-light: #205649;
+  --color-secondary: #299B6A;     /* Hijau: Tombol & Indikator Aktif */
+  --color-secondary-hover: #228459;
+  --color-secondary-soft: rgba(41, 155, 106, 0.12);
+
+  --color-bg: #F5F8F5;            /* Putih kehijauan: Latar dashboard */
+  --color-card: #FFFFFF;          /* Putih bersih untuk kartu */
+  --color-card-hover: #FAFCFA;
+  --color-inset: #EEF4F0;
+
+  --color-sensor: #2389D7;        /* Biru: Nilai & Grafik Sensor */
+  --color-sensor-soft: rgba(35, 137, 215, 0.12);
+
+  --color-warning: #E99A35;       /* Oranye: Tanah kering & Peringatan */
+  --color-warning-soft: rgba(233, 154, 53, 0.12);
+
+  --color-danger: #D64545;        /* Merah: Gangguan & Status Pompa OFF */
+  --color-danger-hover: #BD3838;
+  --color-danger-soft: rgba(214, 69, 69, 0.12);
+
+  --color-text-main: #1F2E2B;
+  --color-text-muted: #5F736E;
+  --color-text-dim: #879A95;
+  --color-text-inverse: #FFFFFF;
+
+  --border-subtle: #E2ECE5;
+  --border-medium: #CBDDD2;
+  --border-focus: #299B6A;
+
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-full: 9999px;
+
+  --shadow-sm: 0 2px 6px rgba(23, 63, 53, 0.05);
+  --shadow-md: 0 8px 20px -4px rgba(23, 63, 53, 0.08);
+  --shadow-lg: 0 16px 32px -6px rgba(23, 63, 53, 0.12);
+
+  --font-main: 'Poppins', 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  --transition-fast: 0.18s ease;
+  --transition-normal: 0.28s ease;
+}
+
+/* Dark Mode Theme */
+[data-theme="dark"] {
+  --color-primary: #122923;
+  --color-primary-light: #1A3A32;
+  --color-bg: #0D1714;
+  --color-card: #152520;
+  --color-card-hover: #192D27;
+  --color-inset: #0F1D19;
+
+  --color-text-main: #EEF6F2;
+  --color-text-muted: #9BB3A9;
+  --color-text-dim: #6F857D;
+
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-medium: rgba(255, 255, 255, 0.14);
+
+  --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 8px 24px -4px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 16px 36px -6px rgba(0, 0, 0, 0.5);
+}
+
+/* ==========================================================================
+   Base & Reset
+   ========================================================================== */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-main);
+  background-color: var(--color-bg);
+  color: var(--color-text-main);
+  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  transition: background-color var(--transition-normal), color var(--transition-normal);
+}
+
+.container {
+  width: 100%;
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 0 1.25rem;
+}
+
+main.main-content {
+  flex: 1;
+  padding: 1.75rem 0 3.5rem;
+}
+
+/* ==========================================================================
+   1. Header (Navbar)
+   ========================================================================== */
+.site-header {
+  background-color: var(--color-primary);
+  color: var(--color-text-inverse);
+  box-shadow: 0 4px 16px rgba(23, 63, 53, 0.15);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  transition: background-color var(--transition-normal);
+}
+
+.header-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 72px;
+}
+
+.brand-section {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  text-decoration: none;
+  color: inherit;
+}
+
+.brand-logo-box {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.brand-logo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.brand-title-wrap {
+  display: flex;
+  flex-direction: column;
+}
+
+.brand-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: #FFFFFF;
+  line-height: 1.2;
+}
+
+.brand-subtitle {
+  font-size: 0.72rem;
+  color: #A0C6B8;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.header-meta-group {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* Clock in Header */
+.header-clock-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 0.35rem 0.85rem;
+  border-radius: var(--radius-full);
+  font-size: 0.8rem;
+  font-family: var(--font-mono);
+  color: #E2ECE5;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+/* MQTT Status Badge */
+.connection-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.4rem 0.9rem;
+  border-radius: var(--radius-full);
+  font-size: 0.78rem;
+  font-weight: 600;
+  font-family: var(--font-mono);
+  transition: all var(--transition-fast);
+}
+
+.connection-badge.online {
+  background: rgba(41, 155, 106, 0.25);
+  color: #4ADE80;
+  border: 1px solid rgba(74, 222, 128, 0.4);
+}
+
+.connection-badge.connecting {
+  background: rgba(233, 154, 53, 0.25);
+  color: #FBBF24;
+  border: 1px solid rgba(251, 191, 36, 0.4);
+}
+
+.connection-badge.offline {
+  background: rgba(214, 69, 69, 0.25);
+  color: #F87171;
+  border: 1px solid rgba(248, 113, 113, 0.4);
+}
+
+.pulse-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: currentColor;
+}
+
+.connection-badge.online .pulse-indicator {
+  box-shadow: 0 0 8px currentColor;
+  animation: pulse-ring 2s infinite;
+}
+
+@keyframes pulse-ring {
+  0% { transform: scale(0.95); opacity: 0.8; }
+  50% { transform: scale(1.15); opacity: 1; }
+  100% { transform: scale(0.95); opacity: 0.8; }
+}
+
+/* Header Buttons */
+.btn-header-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  outline: none;
+}
+
+.btn-header-icon:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+/* ==========================================================================
+   2. Alert / Warning Notification Bar
+   ========================================================================== */
+.alert-banner {
+  background: var(--color-warning-soft);
+  border: 1px solid rgba(233, 154, 53, 0.35);
+  color: var(--color-warning);
+  padding: 0.85rem 1.25rem;
+  border-radius: var(--radius-md);
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-fast);
+}
+
+.alert-banner.danger {
+  background: var(--color-danger-soft);
+  border-color: rgba(214, 69, 69, 0.35);
+  color: var(--color-danger);
+}
+
+.alert-banner.info {
+  background: var(--color-sensor-soft);
+  border-color: rgba(35, 137, 215, 0.35);
+  color: var(--color-sensor);
+}
+
+.alert-content-box {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.alert-close-btn {
+  background: transparent;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  font-size: 1rem;
+  opacity: 0.7;
+  padding: 0.2rem;
+}
+
+.alert-close-btn:hover {
+  opacity: 1;
+}
+
+/* ==========================================================================
+   3. Kartu Informasi (4 Kolom Utama)
+   ========================================================================== */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 1.75rem;
+}
+
+.info-card {
+  background: var(--color-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 1.35rem 1.4rem;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), border-color var(--transition-fast);
+}
+
+.info-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--border-medium);
+}
+
+.card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.card-label {
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.card-icon-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+}
+
+.card-icon-avatar.green { background: var(--color-secondary-soft); color: var(--color-secondary); }
+.card-icon-avatar.blue { background: var(--color-sensor-soft); color: var(--color-sensor); }
+.card-icon-avatar.orange { background: var(--color-warning-soft); color: var(--color-warning); }
+.card-icon-avatar.red { background: var(--color-danger-soft); color: var(--color-danger); }
+
+.card-value-display {
+  display: flex;
+  align-items: baseline;
+  gap: 0.35rem;
+  margin: 0.2rem 0 0.5rem;
+}
+
+.card-hero-number {
+  font-size: 2.8rem;
+  font-weight: 700;
+  line-height: 1.1;
+  font-family: var(--font-main);
+  letter-spacing: -0.02em;
+}
+
+.card-hero-unit {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.card-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.65rem;
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 600;
+  width: fit-content;
+}
+
+.card-status-pill.green { background: var(--color-secondary-soft); color: var(--color-secondary); }
+.card-status-pill.blue { background: var(--color-sensor-soft); color: var(--color-sensor); }
+.card-status-pill.orange { background: var(--color-warning-soft); color: var(--color-warning); }
+.card-status-pill.red { background: var(--color-danger-soft); color: var(--color-danger); }
+
+.card-desc-footer {
+  font-size: 0.78rem;
+  color: var(--color-text-dim);
+  margin-top: 0.6rem;
+  border-top: 1px dashed var(--border-subtle);
+  padding-top: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Secondary Environmental Row (Air Temp, Humidity, & Water Need Prediction) */
+.env-bar {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 1.75rem;
+}
+
+.env-card {
+  background: var(--color-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 1rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: var(--shadow-sm);
+}
+
+.env-item-left {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.env-val {
+  font-size: 1.45rem;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  color: var(--color-text-main);
+}
+
+/* ==========================================================================
+   4. Section Panel Container
+   ========================================================================== */
+.panel-card {
+  background: var(--color-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 1.75rem;
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+  border-bottom: 1px solid var(--border-subtle);
+  padding-bottom: 0.85rem;
+}
+
+.panel-title-group {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.panel-title-icon {
+  color: var(--color-secondary);
+  font-size: 1.15rem;
+}
+
+.panel-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--color-text-main);
+}
+
+.panel-subtitle {
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+}
+
+/* ==========================================================================
+   5. Panel Kontrol Penyiraman (Mode & Pompa Manual)
+   ========================================================================== */
+.control-flex-layout {
+  display: grid;
+  grid-template-columns: 1fr 1.3fr;
+  gap: 1.5rem;
+}
+
+/* Mode Switcher */
+.mode-switch-box {
+  background: var(--color-inset);
+  padding: 1.25rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.mode-buttons-group {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.65rem;
+  background: rgba(0, 0, 0, 0.05);
+  padding: 0.35rem;
+  border-radius: var(--radius-sm);
+  margin: 0.85rem 0;
+}
+
+.btn-mode-tab {
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-sm);
+  border: none;
+  font-family: var(--font-main);
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  background: transparent;
+  color: var(--color-text-muted);
+  transition: all var(--transition-fast);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.btn-mode-tab.active {
+  background: var(--color-card);
+  color: var(--color-secondary);
+  box-shadow: var(--shadow-sm);
+}
+
+.mode-note {
+  font-size: 0.76rem;
+  color: var(--color-text-dim);
+  line-height: 1.4;
+}
+
+/* Manual Pump Buttons */
+.pump-controls-box {
+  background: var(--color-inset);
+  padding: 1.25rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.pump-controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin: 0.85rem 0;
+}
+
+.pump-controls button {
+  min-height: 52px;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-main);
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  transition: all var(--transition-fast);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-pump-on {
+  background: var(--color-secondary);
+  color: #FFFFFF;
+}
+
+.btn-pump-on:hover:not(:disabled) {
+  background: var(--color-secondary-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(41, 155, 106, 0.3);
+}
+
+.btn-pump-off {
+  background: var(--color-danger);
+  color: #FFFFFF;
+}
+
+.btn-pump-off:hover:not(:disabled) {
+  background: var(--color-danger-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(214, 69, 69, 0.3);
+}
+
+.pump-controls button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  filter: grayscale(60%);
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.pump-feedback-text {
+  font-size: 0.78rem;
+  color: var(--color-text-dim);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+/* ==========================================================================
+   6. Panel Grafik Sensor
+   ========================================================================== */
+.chart-container-box {
+  position: relative;
+  height: 320px;
+  width: 100%;
+}
+
+/* ==========================================================================
+   7. Panel Jadwal & Ambang Batas
+   ========================================================================== */
+.settings-two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.settings-group {
+  background: var(--color-inset);
+  padding: 1.25rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+}
+
+.settings-group-title {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--color-text-main);
+  margin-bottom: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.threshold-slider-item {
+  margin-bottom: 1rem;
+}
+
+.slider-label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.35rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.range-input {
+  width: 100%;
+  height: 8px;
+  border-radius: var(--radius-full);
+  background: var(--border-medium);
+  outline: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+}
+
+.range-input::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--color-secondary);
+  cursor: pointer;
+  box-shadow: 0 0 6px rgba(41, 155, 106, 0.4);
+}
+
+.schedule-times-row {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  margin-bottom: 0.85rem;
+}
+
+.time-input-field {
+  padding: 0.45rem 0.65rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-medium);
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  background: var(--color-card);
+  color: var(--color-text-main);
+}
+
+/* ==========================================================================
+   8. Riwayat Aktivitas & CSV Export
+   ========================================================================== */
+.history-table-wrapper {
+  overflow-x: auto;
+  margin-top: 0.5rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-subtle);
+}
+
+.history-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.84rem;
+  text-align: left;
+}
+
+.history-table th {
+  background: var(--color-inset);
+  padding: 0.75rem 1rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.history-table td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border-subtle);
+  color: var(--color-text-main);
+}
+
+.history-table tr:last-child td {
+  border-bottom: none;
+}
+
+.history-table tr:hover {
+  background: rgba(0, 0, 0, 0.02);
+}
+
+.btn-secondary-action {
+  background: var(--color-inset);
+  border: 1px solid var(--border-medium);
+  padding: 0.45rem 0.95rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--color-text-main);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.btn-secondary-action:hover {
+  background: var(--border-medium);
+}
+
+/* ==========================================================================
+   9. Virtual ESP32 Simulator Box
+   ========================================================================== */
+.simulator-box {
+  background: var(--color-inset);
+  border: 1px dashed var(--color-secondary);
+  border-radius: var(--radius-md);
+  padding: 1.1rem 1.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.75rem;
+}
+
+.sim-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.85rem;
+}
+
+.sim-buttons-group {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.btn-sim {
+  padding: 0.45rem 0.9rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  border: 1px solid var(--border-medium);
+  background: var(--color-card);
+  color: var(--color-text-main);
+  transition: all var(--transition-fast);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.btn-sim:hover {
+  background: var(--color-secondary);
+  color: #fff;
+  border-color: var(--color-secondary);
+}
+
+/* ==========================================================================
+   10. Modal Konfigurasi MQTT
+   ========================================================================== */
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(18, 41, 35, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--transition-normal);
+}
+
+.modal-backdrop.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.modal-window {
+  background: var(--color-card);
+  width: 95%;
+  max-width: 580px;
+  border-radius: var(--radius-md);
+  padding: 1.75rem;
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--border-subtle);
+  transform: translateY(20px);
+  transition: transform var(--transition-normal);
+}
+
+.modal-backdrop.open .modal-window {
+  transform: translateY(0);
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+  border-bottom: 1px solid var(--border-subtle);
+  padding-bottom: 0.75rem;
+}
+
+.modal-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--color-text-main);
+}
+
+.form-group-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.form-group-full {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-bottom: 1rem;
+}
+
+.form-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.form-control {
+  padding: 0.6rem 0.85rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-medium);
+  background: var(--color-inset);
+  color: var(--color-text-main);
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  outline: none;
+}
+
+.form-control:focus {
+  border-color: var(--color-secondary);
+  background: var(--color-card);
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+  border-top: 1px solid var(--border-subtle);
+  padding-top: 1rem;
+}
+
+/* ==========================================================================
+   11. Toast Notifications Container
+   ========================================================================== */
+.toast-shelf {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  z-index: 300;
+  pointer-events: none;
+}
+
+.toast-message {
+  pointer-events: auto;
+  background: var(--color-card);
+  color: var(--color-text-main);
+  border: 1px solid var(--border-medium);
+  border-left: 4px solid var(--color-secondary);
+  padding: 0.75rem 1.1rem;
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-md);
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  animation: toast-fly-in 0.25s ease-out forwards;
+}
+
+.toast-message.warning { border-left-color: var(--color-warning); }
+.toast-message.danger { border-left-color: var(--color-danger); }
+.toast-message.info { border-left-color: var(--color-sensor); }
+
+@keyframes toast-fly-in {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+/* ==========================================================================
+   12. Footer
+   ========================================================================== */
+.site-footer {
+  background: var(--color-card);
+  border-top: 1px solid var(--border-subtle);
+  padding: 1.5rem 0;
+  font-size: 0.82rem;
+  color: var(--color-text-muted);
+  margin-top: auto;
+}
+
+.footer-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+/* ==========================================================================
+   13. Additional UI Components (Multi-Pot, User Role, Mini Progress Bar)
+   ========================================================================== */
+/* Plant Pot Selector & Banner */
+.plant-selector-bar {
+  background: var(--color-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 0.85rem 1.25rem;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  box-shadow: var(--shadow-sm);
+  flex-wrap: wrap;
+}
+
+.plant-selector-left {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.plant-select-dropdown {
+  padding: 0.45rem 0.95rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-medium);
+  background: var(--color-inset);
+  color: var(--color-text-main);
+  font-family: var(--font-main);
+  font-size: 0.88rem;
+  font-weight: 600;
+  outline: none;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.plant-select-dropdown:focus {
+  border-color: var(--color-secondary);
+  box-shadow: 0 0 0 3px var(--color-secondary-soft);
+}
+
+.plant-meta-chips {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+}
+
+/* Mini Progress Bar in Cards */
+.progress-bar-track {
+  width: 100%;
+  height: 6px;
+  background: var(--border-subtle);
+  border-radius: var(--radius-full);
+  margin: 0.5rem 0 0.35rem;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #38BDF8, #2389D7);
+  border-radius: var(--radius-full);
+  transition: width 0.4s ease;
+}
+
+/* User Role Button in Header */
+.btn-role-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  background: rgba(255, 255, 255, 0.12);
+  color: #FFFFFF;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 0.35rem 0.85rem;
+  border-radius: var(--radius-full);
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  outline: none;
+  transition: all var(--transition-fast);
+}
+
+.btn-role-chip:hover {
+  background: rgba(255, 255, 255, 0.22);
+  transform: translateY(-2px);
+}
+
+/* Role Modal Options */
+.role-options-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin: 1rem 0;
+}
+
+.role-card-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-sm);
+  background: var(--color-inset);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.role-card-label:hover {
+  border-color: var(--color-secondary);
+  background: var(--color-card);
+}
+
+.role-card-label input[type="radio"] {
+  margin-top: 0.25rem;
+  accent-color: var(--color-secondary);
+}
+
+.role-title {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--color-text-main);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.role-desc {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  margin-top: 0.2rem;
+  line-height: 1.35;
+}
+
+/* Secondary Simulator Buttons */
+.btn-sim.warning {
+  border-color: rgba(233, 154, 53, 0.4);
+  color: var(--color-warning);
+}
+
+.btn-sim.warning:hover {
+  background: var(--color-warning);
+  color: #fff;
+}
+
+.btn-sim.info {
+  border-color: rgba(35, 137, 215, 0.4);
+  color: var(--color-sensor);
+}
+
+.btn-sim.info:hover {
+  background: var(--color-sensor);
+  color: #fff;
+}
+

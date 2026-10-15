@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <!-- Tag meta viewport wajib sesuai Bagian 17 desain1.md -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smart Garden - IoT Plant Monitoring &amp; Smart Irrigation</title>
+  <meta name="description" content="Website pemantauan kelembapan tanah dan kendali penyiraman tanaman secara pintar berbasis IoT MQTT WebSocket dengan histeresis otomatis dan penjadwalan.">
+  <link rel="icon" type="image/svg+xml" href="assets/icons/favicon.svg">
+  <link rel="alternate icon" type="image/png" href="assets/images/logo.png">
+
+  <!-- Google Fonts: Poppins, Inter, & JetBrains Mono Sesuai Bagian 8 desain1.md -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome 6 Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  <!-- Stylesheet Modern Natural & Responsive Layout -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+
+  <!-- ======================================================================
+       1. Header: Nama aplikasi, Waktu pembaruan, & Status koneksi (Bagian 7)
+       ====================================================================== -->
+  <header class="site-header" id="mainHeader">
+    <div class="container header-container">
+      <div class="brand-section">
+        <div class="brand-logo-box">
+          <img src="assets/images/logo.svg" alt="Smart Garden Logo" class="brand-logo-img" onerror="this.onerror=null; this.src='assets/images/logo.png';">
+        </div>
+        <div class="brand-title-wrap">
+          <span class="brand-title">Smart Garden</span>
+          <span class="brand-subtitle">IoT Plant Monitoring</span>
+        </div>
+      </div>
+
+      <div class="header-meta-group">
+        <!-- Waktu Sistem Real-time -->
+        <div class="header-clock-chip" id="headerClockBox" title="Waktu Sistem Real-Time">
+          <i class="fa-regular fa-clock"></i>
+          <span id="headerClockText">Memuat waktu...</span>
+        </div>
+
+        <!-- Status Koneksi Broker MQTT -->
+        <div class="connection-badge connecting" id="mqttConnectionBadge" title="Status Koneksi Broker MQTT WebSocket">
+          <span class="pulse-indicator"></span>
+          <span id="mqttBadgeText">Menyambung...</span>
+        </div>
+
+        <!-- Tombol Hak Akses & Peran Pengguna (Bagian 2 & 5) -->
+        <button class="btn-role-chip" id="userRoleBtn" type="button" title="Ganti Peran Pengguna (Admin / Pemilik / Siswa / Pengelola)">
+          <i class="fa-solid fa-user-shield"></i>
+          <span>Admin</span>
+        </button>
+
+        <!-- Tombol Ganti Tema (Terang / Gelap) - Bagian 8 -->
+        <button class="btn-header-icon" id="btnThemeToggle" type="button" title="Ganti Tema (Gelap / Terang)">
+          <i class="fa-solid fa-moon" id="themeToggleIcon"></i>
+        </button>
+
+        <!-- Tombol Pengaturan Konfigurasi Broker MQTT - Bagian 15 -->
+        <button class="btn-header-icon" id="btnOpenSettings" type="button" title="Buka Pengaturan Broker MQTT">
+          <i class="fa-solid fa-sliders"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ======================================================================
+       Main Content Area
+       ====================================================================== -->
+  <main class="main-content">
+    <div class="container">
+
+      <!-- Alert / Warning Banner (Muncul saat tanah terlalu kering, pompa timeout, atau offline) -->
+      <div class="alert-banner warning" id="globalAlertBanner" style="display: none;" role="alert">
+        <div class="alert-content-box">
+          <i class="fa-solid fa-triangle-exclamation" style="font-size: 1.25rem;"></i>
+          <span id="alertBannerText">Peringatan telemetri sistem irigasi kebun.</span>
+        </div>
+        <button class="alert-close-btn" id="btnCloseAlert" type="button" title="Tutup Notifikasi">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- ==================================================================
+           Pemantauan Beberapa Pot atau Area Tanaman (Bagian 2 & 5 desain1.md)
+           ================================================================== -->
+      <section class="plant-selector-bar" aria-label="Pemilihan Pot atau Area Tanaman">
+        <div class="plant-selector-left">
+          <i class="fa-solid fa-seedling" style="color:var(--color-secondary); font-size:1.25rem;"></i>
+          <div>
+            <label for="plantPotSelect" style="font-size:0.75rem; font-weight:700; text-transform:uppercase; color:var(--color-text-muted); display:block; margin-bottom:0.15rem;">
+              Area / Pot Tanaman Aktif
+            </label>
+            <select id="plantPotSelect" class="plant-select-dropdown">
+              <!-- Opsi pot tanaman dimuat secara dinamis oleh JavaScript -->
+            </select>
+          </div>
+        </div>
+
+        <div class="plant-meta-chips">
+          <span class="card-status-pill green" id="activePlantBadge">
+            <i class="fa-solid fa-leaf"></i> Pot 1 • Monstera Deliciosa
+          </span>
+          <span id="activePlantIdealRange" style="font-family:var(--font-mono); font-size:0.76rem; color:var(--color-text-muted);">
+            Target Ideal: 50% - 65%
+          </span>
+        </div>
+      </section>
+
+      <!-- ==================================================================
+           2. Kartu Informasi (Dashboard Grid 4 Kolom) - Sesuai Bagian 7 desain1.md
+           ================================================================== -->
+      <section class="dashboard-grid" aria-label="Ringkasan Status Telemetri Smart Garden">
+        <!-- Kartu 1: Kelembapan Tanah -->
+        <article class="info-card" id="cardMoisture">
+          <div>
+            <div class="card-top">
+              <span class="card-label">Kelembapan Tanah</span>
+              <div class="card-icon-avatar blue">
+                <i class="fa-solid fa-droplet"></i>
+              </div>
+            </div>
+            <div class="card-value-display">
+              <span class="card-hero-number" id="moistureValue" style="color: var(--color-sensor);">65</span>
+              <span class="card-hero-unit">%</span>
+            </div>
+            <!-- Mini progress bar -->
+            <div class="progress-bar-track">
+              <div class="progress-bar-fill" id="moistureProgressBar" style="width: 65%;"></div>
+            </div>
+            <div class="card-status-pill green" id="moistureStatusPill">
+              <i class="fa-solid fa-seedling"></i> Kondisi Optimal
+            </div>
+          </div>
+          <div class="card-desc-footer">
+            <span>Contoh data sensor</span>
+            <span id="lastSensorUpdateTime">Belum ada data</span>
+          </div>
+        </article>
+
+        <!-- Kartu 2: Status Pompa -->
+        <article class="info-card" id="cardPump">
+          <div>
+            <div class="card-top">
+              <span class="card-label">Status Pompa</span>
+              <div class="card-icon-avatar red" id="pumpIconAvatar">
+                <i class="fa-solid fa-faucet-drip"></i>
+              </div>
+            </div>
+            <div class="card-value-display">
+              <span class="card-hero-number" id="pumpStatusValue" style="color: var(--color-danger);">OFF</span>
+            </div>
+            <div class="card-status-pill red" id="pumpStatusPill">
+              <i class="fa-solid fa-power-off"></i> Pompa Tidak Aktif
+            </div>
+          </div>
+          <div class="card-desc-footer">
+            <span id="pumpDescText">Pompa tidak aktif</span>
+            <i class="fa-solid fa-shield-halved" title="Safety Watchdog Enabled (Maks 10 Menit)"></i>
+          </div>
+        </article>
+
+        <!-- Kartu 3: Mode Sistem -->
+        <article class="info-card" id="cardMode">
+          <div>
+            <div class="card-top">
+              <span class="card-label">Mode Sistem</span>
+              <div class="card-icon-avatar green">
+                <i class="fa-solid fa-microchip"></i>
+              </div>
+            </div>
+            <div class="card-value-display">
+              <span class="card-hero-number" id="modeStatusValue" style="color: var(--color-primary);">AUTO</span>
+            </div>
+            <div class="card-status-pill green" id="modeStatusPill">
+              <i class="fa-solid fa-robot"></i> Kendali Otomatis
+            </div>
+          </div>
+          <div class="card-desc-footer">
+            <span>Kendali otomatis</span>
+            <span id="modeHysteresisText">Histeresis 35% - 60%</span>
+          </div>
+        </article>
+
+        <!-- Kartu 4: Koneksi MQTT & Status Perangkat -->
+        <article class="info-card" id="cardConnection">
+          <div>
+            <div class="card-top">
+              <span class="card-label">Koneksi MQTT</span>
+              <div class="card-icon-avatar green">
+                <i class="fa-solid fa-satellite-dish"></i>
+              </div>
+            </div>
+            <div class="card-value-display">
+              <span class="card-hero-number" id="cardMqttStatusVal" style="color: var(--color-secondary);">Online</span>
+            </div>
+            <div class="card-status-pill green" id="deviceStatusBadge">
+              <i class="fa-solid fa-circle-check"></i> Perangkat Terhubung
+            </div>
+          </div>
+          <div class="card-desc-footer">
+            <span id="deviceStatusDesc">Contoh status koneksi</span>
+            <span style="font-family: var(--font-mono); font-size: 0.72rem;">WSS 8084</span>
+          </div>
+        </article>
+      </section>
+
+      <!-- ==================================================================
+           Bar Lingkungan Tambahan & Indikator Kebutuhan Air (Bagian 5 desain1.md)
+           ================================================================== -->
+      <section class="env-bar" aria-label="Telemetri Lingkungan dan Prediksi Kebutuhan Air">
+        <div class="env-card">
+          <div class="env-item-left">
+            <div class="card-icon-avatar orange">
+              <i class="fa-solid fa-temperature-half"></i>
+            </div>
+            <div>
+              <div class="card-label">Suhu Udara Sekitar</div>
+              <div class="env-val" id="airTempValue">28.5 °C</div>
+            </div>
+          </div>
+          <span style="font-size: 0.75rem; color: var(--color-text-dim);">Sensor Lingkungan</span>
+        </div>
+
+        <div class="env-card">
+          <div class="env-item-left">
+            <div class="card-icon-avatar blue">
+              <i class="fa-solid fa-wind"></i>
+            </div>
+            <div>
+              <div class="card-label">Kelembapan Udara (RH)</div>
+              <div class="env-val" id="airHumidityValue">68%</div>
+            </div>
+          </div>
+          <span style="font-size: 0.75rem; color: var(--color-text-dim);">Sirkulasi Udara</span>
+        </div>
+
+        <!-- Indikator Perkiraan Kebutuhan Penyiraman (Bagian 5) -->
+        <div class="env-card">
+          <div class="env-item-left">
+            <div class="card-icon-avatar green">
+              <i class="fa-solid fa-gauge-high"></i>
+            </div>
+            <div>
+              <div class="card-label">Kebutuhan Penyiraman</div>
+              <div class="card-status-pill green" id="waterNeedBadge" style="margin-top:0.25rem;">
+                <i class="fa-solid fa-shield-heart"></i> Kondisi Optimal
+              </div>
+            </div>
+          </div>
+          <span id="waterNeedDesc" style="font-size: 0.72rem; color: var(--color-text-dim); max-width:180px; text-align:right;">
+            Kadar air tanah ideal.
+          </span>
+        </div>
+      </section>
+
+      <!-- ==================================================================
+           3. Panel Kontrol Penyiraman (Bagian 7 & 14 desain1.md)
+           ================================================================== -->
+      <section class="panel-card" id="panelControls">
+        <div class="panel-header">
+          <div class="panel-title-group">
+            <i class="fa-solid fa-faucet panel-title-icon"></i>
+            <div>
+              <h2 class="panel-title">Kontrol Penyiraman</h2>
+              <div class="panel-subtitle">Pengendalian mode sistem dan sakelar pompa air</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="control-flex-layout">
+          <!-- Pilihan Mode Operasi -->
+          <div class="mode-switch-box">
+            <div>
+              <span class="card-label">Pilihan Mode Operasi</span>
+              <div class="mode-buttons-group">
+                <button class="btn-mode-tab active" id="tabModeAuto" type="button">
+                  <i class="fa-solid fa-robot"></i> Mode AUTO
+                </button>
+                <button class="btn-mode-tab" id="tabModeManual" type="button">
+                  <i class="fa-solid fa-hand"></i> Mode MANUAL
+                </button>
+              </div>
+            </div>
+            <p class="mode-note">
+              <strong>Catatan:</strong> Kontrol pompa manual hanya aktif ketika mode <code>MANUAL</code> dipilih. Pada mode <code>AUTO</code>, pompa menyala dan mati secara otomatis berdasarkan ambang batas kelembapan dan jadwal.
+            </p>
+          </div>
+
+          <!-- Tombol Kontrol Pompa Manual -->
+          <div class="pump-controls-box">
+            <div>
+              <span class="card-label">Kendali Pompa Air</span>
+              <div class="pump-controls">
+                <button class="btn-pump-on" id="btnPumpOn" type="button" disabled>
+                  <i class="fa-solid fa-power-off"></i> Pompa ON
+                </button>
+                <button class="btn-pump-off" id="btnPumpOff" type="button" disabled>
+                  <i class="fa-solid fa-ban"></i> Pompa OFF
+                </button>
+              </div>
+            </div>
+            <div class="pump-feedback-text" id="pumpFeedbackText">
+              <i class="fa-solid fa-lock"></i> Kontrol pompa manual hanya aktif ketika mode MANUAL dipilih.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================================================================
+           4. Grafik Sensor: Kelembapan Tanah & Suhu (Bagian 7 & 13 desain1.md)
+           ================================================================== -->
+      <section class="panel-card" id="panelChart">
+        <div class="panel-header">
+          <div class="panel-title-group">
+            <i class="fa-solid fa-chart-line panel-title-icon"></i>
+            <div>
+              <h2 class="panel-title">Grafik Kelembapan Tanah</h2>
+              <div class="panel-subtitle">Visualisasi perubahan kelembapan tanah dari waktu ke waktu</div>
+            </div>
+          </div>
+          <span class="card-status-pill green">
+            <i class="fa-solid fa-bolt"></i> Live Stream
+          </span>
+        </div>
+
+        <div class="chart-container-box">
+          <canvas id="moistureHistoryChart"></canvas>
+        </div>
+        <p style="font-size:0.75rem; color:var(--color-text-dim); margin-top:0.6rem; text-align:right;">
+          Ilustrasi data sensor dan fluktuasi telemetri real-time.
+        </p>
+      </section>
+
+      <!-- ==================================================================
+           5. Panel Jadwal & Ambang Batas (Bagian 7, 14, & 15 desain1.md)
+           ================================================================== -->
+      <section class="panel-card" id="panelSettings">
+        <div class="panel-header">
+          <div class="panel-title-group">
+            <i class="fa-solid fa-calendar-days panel-title-icon"></i>
+            <div>
+              <h2 class="panel-title">Panel Jadwal &amp; Pengaturan Ambang Kelembapan</h2>
+              <div class="panel-subtitle">Parameter otomatisasi histeresis kadar air dan waktu penyiraman terprogram</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-two-col">
+          <!-- Ambang Batas Kelembapan (Histeresis) -->
+          <div class="settings-group">
+            <div class="settings-group-title">
+              <i class="fa-solid fa-sliders" style="color:var(--color-secondary);"></i>
+              Pengaturan Ambang Kelembapan (Histeresis)
+            </div>
+
+            <!-- Batas Kering (Pompa ON) -->
+            <div class="threshold-slider-item">
+              <div class="slider-label-row">
+                <span>Batas Kering (Pompa ON)</span>
+                <span style="color:var(--color-warning); font-family:var(--font-mono);" id="dryThresholdDisplay">&lt; 35%</span>
+              </div>
+              <input type="range" class="range-input" id="sliderDryThreshold" min="15" max="50" value="35" step="1">
+              <span style="font-size: 0.72rem; color: var(--color-text-dim); display:block; margin-top:0.2rem;">
+                Pompa otomatis menyala saat kelembapan tanah mencapai atau di bawah batas ini.
+              </span>
+            </div>
+
+            <!-- Batas Cukup/Basah (Pompa OFF) -->
+            <div class="threshold-slider-item">
+              <div class="slider-label-row">
+                <span>Batas Cukup Basah (Pompa OFF)</span>
+                <span style="color:var(--color-secondary); font-family:var(--font-mono);" id="wetThresholdDisplay">&gt;= 60%</span>
+              </div>
+              <input type="range" class="range-input" id="sliderWetThreshold" min="50" max="85" value="60" step="1">
+              <span style="font-size: 0.72rem; color: var(--color-text-dim); display:block; margin-top:0.2rem;">
+                Pompa otomatis mati setelah tanah mencapai kelembapan cukup basah.
+              </span>
+            </div>
+
+            <div style="background:var(--color-card); padding:0.6rem 0.8rem; border-radius:var(--radius-sm); border:1px solid var(--border-subtle); font-size:0.72rem; color:var(--color-text-muted);">
+              <strong>Prinsip Histeresis:</strong> Jika nilai berada di antara 35% dan 60%, status pompa mengikuti keadaan sebelumnya untuk mencegah relay bergetar/siklus hidup-mati cepat.
+            </div>
+          </div>
+
+          <!-- Jadwal Penyiraman Jam Tertentu (Bagian 14) -->
+          <div class="settings-group">
+            <div class="settings-group-title">
+              <i class="fa-solid fa-clock" style="color:var(--color-secondary);"></i>
+              Jadwal Penyiraman Jam Tertentu
+            </div>
+
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom: 0.85rem;">
+              <span style="font-size:0.85rem; font-weight:600;">Aktifkan Otomatisasi Jadwal</span>
+              <input type="checkbox" id="scheduleEnabledToggle" checked style="width:18px; height:18px; accent-color:var(--color-secondary); cursor:pointer;">
+            </div>
+
+            <div class="schedule-times-row">
+              <div style="flex:1;">
+                <label style="font-size:0.75rem; color:var(--color-text-muted); display:block; margin-bottom:0.25rem;">Jadwal 1 (Pagi)</label>
+                <input type="time" class="time-input-field" id="schedTime1" value="06:00" style="width:100%;">
+              </div>
+              <div style="flex:1;">
+                <label style="font-size:0.75rem; color:var(--color-text-muted); display:block; margin-bottom:0.25rem;">Jadwal 2 (Sore)</label>
+                <input type="time" class="time-input-field" id="schedTime2" value="17:00" style="width:100%;">
+              </div>
+            </div>
+
+            <div style="margin-bottom:0.85rem;">
+              <label style="font-size:0.75rem; color:var(--color-text-muted); display:block; margin-bottom:0.25rem;">Durasi Pompa Aktif Per Jadwal (Detik)</label>
+              <input type="number" class="time-input-field" id="schedDuration" value="20" min="5" max="300" style="width:100%;">
+            </div>
+
+            <p style="font-size:0.72rem; color:var(--color-text-dim); margin-bottom:0.85rem;">
+              Sistem dilengkapi proteksi anti-duplicate agar jadwal tidak dieksekusi berulang dalam menit yang sama.
+            </p>
+
+            <button class="btn-secondary-action" id="btnSaveSchedule" type="button" style="width:100%; justify-content:center;">
+              <i class="fa-solid fa-floppy-disk"></i> Simpan Pengaturan Jadwal
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================================================================
+           6. Riwayat Aktivitas & Ekspor CSV (Bagian 5 & 7 desain1.md)
+           ================================================================== -->
+      <section class="panel-card" id="panelHistory">
+        <div class="panel-header">
+          <div class="panel-title-group">
+            <i class="fa-solid fa-list-check panel-title-icon"></i>
+            <div>
+              <h2 class="panel-title">Riwayat Aktivitas &amp; Log Pembacaan Sensor</h2>
+              <div class="panel-subtitle">Catatan pembacaan sensor dan perubahan status pompa air</div>
+            </div>
+          </div>
+          <!-- Tombol Ekspor CSV sesuai Bagian 5 -->
+          <button class="btn-secondary-action" id="btnExportCSV" type="button" title="Unduh Riwayat Data ke Format CSV">
+            <i class="fa-solid fa-file-csv"></i> Ekspor CSV
+          </button>
+        </div>
+
+        <div style="display:grid; grid-template-columns: 1.5fr 1fr; gap:1.5rem;" class="control-flex-layout">
+          <!-- Tabel Pembacaan Sensor Terkini -->
+          <div>
+            <span class="card-label" style="margin-bottom:0.4rem; display:block;">Pencatatan Telemetri Sensor</span>
+            <div class="history-table-wrapper">
+              <table class="history-table">
+                <thead>
+                  <tr>
+                    <th>Waktu</th>
+                    <th>Tanaman</th>
+                    <th>Kelembapan</th>
+                    <th>Suhu</th>
+                    <th>Udara</th>
+                    <th>Pompa</th>
+                  </tr>
+                </thead>
+                <tbody id="historyTableBody">
+                  <!-- Data baris telemetri dimasukkan secara dinamis -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Log Aktivitas & Perubahan Status -->
+          <div>
+            <span class="card-label" style="margin-bottom:0.4rem; display:block;">Catatan Perubahan Status Pompa</span>
+            <div style="background:var(--color-inset); border:1px solid var(--border-subtle); border-radius:var(--radius-sm); padding:0.85rem; height:220px; overflow-y:auto;">
+              <ul id="activityLogList" style="list-style:none;">
+                <!-- Log peristiwa dimasukkan secara dinamis -->
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================================================================
+           Virtual ESP32 Simulator Box (Pengujian Mandiri Tanpa Hardware)
+           ================================================================== -->
+      <section class="simulator-box" aria-label="Simulator ESP32 Virtual">
+        <div class="sim-info">
+          <i class="fa-solid fa-microchip" style="font-size:1.6rem; color:var(--color-secondary);"></i>
+          <div>
+            <strong>Virtual ESP32 Hardware Simulator</strong>
+            <div style="font-size:0.75rem; color:var(--color-text-dim);">
+              Uji coba mandiri seluruh fungsi pemantauan sensor, otomatisasi histeresis, dan respon pompa langsung dari browser.
+            </div>
+          </div>
+        </div>
+
+        <div class="sim-buttons-group">
+          <button class="btn-sim" id="btnSimSingleData" type="button" title="Kirim 1 paket data pembacaan sensor">
+            <i class="fa-solid fa-paper-plane"></i> Kirim Tes Sensor
+          </button>
+          <button class="btn-sim warning" id="btnSimForceDry" type="button" title="Simulasi tanah kering (22%) untuk menguji pompa otomatis menyala">
+            <i class="fa-solid fa-fire"></i> Tes Tanah Kering (22%)
+          </button>
+          <button class="btn-sim info" id="btnSimForceWet" type="button" title="Simulasi tanah basah (72%) untuk menguji pompa otomatis mati">
+            <i class="fa-solid fa-droplet"></i> Tes Tanah Basah (72%)
+          </button>
+          <button class="btn-sim" id="btnToggleSimLoop" type="button" title="Jalankan loop streaming simulasi sensor otomatis">
+            <i class="fa-solid fa-play" id="simLoopIcon"></i> <span id="simLoopText">Auto Sim Loop</span>
+          </button>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- ======================================================================
+       Footer
+       ====================================================================== -->
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div>
+        <strong>Smart Garden IoT</strong> • Pemantauan Kelembapan Tanah &amp; Kendali Penyiraman Cerdas.
+      </div>
+      <div>
+        Protokol: <span style="font-family:var(--font-mono); color:var(--color-secondary);">MQTT WebSocket (WSS)</span> • Mikrokontroler: <span style="font-family:var(--font-mono);">ESP32 / ESP8266</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ======================================================================
+       Modal 1: Konfigurasi Broker MQTT (Bagian 15 desain1.md)
+       ====================================================================== -->
+  <div class="modal-backdrop" id="settingsModalBackdrop" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-window">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modalTitle">
+          <i class="fa-solid fa-network-wired" style="color:var(--color-secondary);"></i> Konfigurasi Broker MQTT
+        </h3>
+        <button class="alert-close-btn" id="btnCloseSettingsModal" type="button" title="Tutup Modal">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <form id="formMqttSettings" onsubmit="return false;">
+        <div class="form-group-grid">
+          <div>
+            <label class="form-label" for="cfgBrokerHost">Broker Host (WebSocket)</label>
+            <input type="text" class="form-control" id="cfgBrokerHost" placeholder="broker.emqx.io" required>
+          </div>
+          <div>
+            <label class="form-label" for="cfgBrokerPort">WebSocket Port (WSS)</label>
+            <input type="number" class="form-control" id="cfgBrokerPort" placeholder="8084" required>
+          </div>
+        </div>
+
+        <div class="form-group-full">
+          <label class="form-label" for="cfgClientId">Client ID Unik Website</label>
+          <input type="text" class="form-control" id="cfgClientId" placeholder="smartgarden_web_xxxx" required>
+        </div>
+
+        <div class="form-group-full">
+          <label class="form-label" for="cfgTopicMoisture">Topik Data Sensor (Subscribe)</label>
+          <input type="text" class="form-control" id="cfgTopicMoisture" placeholder="smartgarden/sensor/moisture" required>
+        </div>
+
+        <div class="form-group-grid">
+          <div>
+            <label class="form-label" for="cfgTopicPumpCmd">Topik Perintah Pompa (Publish)</label>
+            <input type="text" class="form-control" id="cfgTopicPumpCmd" placeholder="smartgarden/pump/command" required>
+          </div>
+          <div>
+            <label class="form-label" for="cfgTopicPumpStat">Topik Status Pompa (Subscribe)</label>
+            <input type="text" class="form-control" id="cfgTopicPumpStat" placeholder="smartgarden/pump/status" required>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary-action" id="btnResetSettingsModal">
+            <i class="fa-solid fa-rotate-left"></i> Reset Default
+          </button>
+          <button type="button" class="btn-secondary-action" id="btnSaveSettingsModal" style="background:var(--color-secondary); color:#fff; border-color:var(--color-secondary);">
+            <i class="fa-solid fa-floppy-disk"></i> Simpan &amp; Terapkan
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       Modal 2: Manajemen Peran Pengguna & Hak Akses (Bagian 2 & 5 desain1.md)
+       ====================================================================== -->
+  <div class="modal-backdrop" id="roleModalBackdrop" role="dialog" aria-modal="true" aria-labelledby="roleModalTitle">
+    <div class="modal-window">
+      <div class="modal-header">
+        <h3 class="modal-title" id="roleModalTitle">
+          <i class="fa-solid fa-users-gear" style="color:var(--color-secondary);"></i> Pengaturan Peran &amp; Hak Akses
+        </h3>
+        <button class="alert-close-btn" id="btnCloseRoleModal" type="button" title="Tutup Modal">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <p style="font-size:0.82rem; color:var(--color-text-muted); margin-bottom:0.85rem;">
+        Pilih peran pengguna untuk menyesuaikan fitur yang dapat diakses (sesuai spesifikasi Bagian 2 desain1.md):
+      </p>
+
+      <div class="role-options-list">
+        <label class="role-card-label">
+          <input type="radio" name="userRoleChoice" value="admin" checked>
+          <div>
+            <div class="role-title"><i class="fa-solid fa-user-shield" style="color:var(--color-secondary);"></i> Administrator</div>
+            <div class="role-desc">Mengatur koneksi MQTT, konfigurasi parameter broker, ambang kelembapan, jadwal, dan kendali pompa penuh.</div>
+          </div>
+        </label>
+
+        <label class="role-card-label">
+          <input type="radio" name="userRoleChoice" value="owner">
+          <div>
+            <div class="role-title"><i class="fa-solid fa-user-check" style="color:#2389D7;"></i> Pemilik Tanaman</div>
+            <div class="role-desc">Memantau kelembapan tanah, mengontrol pompa air secara manual, dan melihat grafik riwayat.</div>
+          </div>
+        </label>
+
+        <label class="role-card-label">
+          <input type="radio" name="userRoleChoice" value="student">
+          <div>
+            <div class="role-title"><i class="fa-solid fa-graduation-cap" style="color:#E99A35;"></i> Siswa atau Mahasiswa</div>
+            <div class="role-desc">Mempelajari penerapan IoT, sensor tanah, dan otomatisasi (Mode Lihat/View-Only untuk pembelajaran).</div>
+          </div>
+        </label>
+
+        <label class="role-card-label">
+          <input type="radio" name="userRoleChoice" value="manager">
+          <div>
+            <div class="role-title"><i class="fa-solid fa-users-gear" style="color:#8B5CF6;"></i> Pengelola Kebun</div>
+            <div class="role-desc">Memantau beberapa tanaman atau area kebun (Multi-Pot) yang terhubung dengan sistem.</div>
+          </div>
+        </label>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn-secondary-action" id="btnSaveRoleModal" style="background:var(--color-secondary); color:#fff; border-color:var(--color-secondary);">
+          <i class="fa-solid fa-check"></i> Terapkan Peran
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Shelf -->
+  <div class="toast-shelf" id="toastShelf" aria-live="polite"></div>
+
+  <!-- Library Pustaka Eksternal Resmi (Sesuai Bagian 9 & 13 desain1.md) -->
+  <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+  <!-- Modular Scripts Smart Garden (Sesuai Bagian 12 desain1.md) -->
+  <script src="config/mqtt-config.example.js"></script>
+  <script src="js/settings.js"></script>
+  <script src="js/sensor.js"></script>
+  <script src="js/pump.js"></script>
+  <script src="js/chart.js"></script>
+  <script src="js/mqtt.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
